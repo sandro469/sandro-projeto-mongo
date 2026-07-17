@@ -16,11 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.sandroeugenio.workshopmongo.domain.Post;
 import com.sandroeugenio.workshopmongo.domain.User;
 import com.sandroeugenio.workshopmongo.dto.UserDTO;
 import com.sandroeugenio.workshopmongo.services.UserService;
-
-import ch.qos.logback.core.joran.spi.HttpUtil.RequestMethod;
 
 @RestController
 @RequestMapping(value = "/users")
@@ -43,42 +42,41 @@ public class UserResource {
 	public ResponseEntity<UserDTO> findById(@PathVariable String id) {
 		User obj = service.findById(id);
 		return ResponseEntity.ok().body(new UserDTO(obj));
-	
 	}
-	
+
 	@PostMapping
 	public ResponseEntity<Void> insert(@RequestBody UserDTO objDto) {
-	    User obj = service.fromDTO(objDto);
-	    obj = service.insert(obj);
+		User obj = service.fromDTO(objDto);
+		obj = service.insert(obj);
 
-	    URI uri = ServletUriComponentsBuilder
-	            .fromCurrentRequest()
-	            .path("/{id}")
-	            .buildAndExpand(obj.getId())
-	            .toUri();
+		URI uri = ServletUriComponentsBuilder
+				.fromCurrentRequest()
+				.path("/{id}")
+				.buildAndExpand(obj.getId())
+				.toUri();
 
-	    return ResponseEntity.created(uri).build();
+		return ResponseEntity.created(uri).build();
 	}
-	
+
 	@PutMapping("/{id}")
 	public ResponseEntity<UserDTO> update(@PathVariable String id, @RequestBody UserDTO objDto) {
-	    User obj = service.fromDTO(objDto);
-	    obj.setId(id);
+		User obj = service.fromDTO(objDto);
+		obj.setId(id);
 
-	    obj = service.update(obj);
+		obj = service.update(obj);
 
-	    return ResponseEntity.ok().body(new UserDTO(obj));
+		return ResponseEntity.ok().body(new UserDTO(obj));
 	}
-		
+
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable String id) {
-	    service.delete(id);
-	    return ResponseEntity.noContent().build();
+		service.delete(id);
+		return ResponseEntity.noContent().build();
 	}
-	
+
+	@GetMapping("/{id}/posts")
+	public ResponseEntity<List<Post>> findPosts(@PathVariable String id) {
+		User obj = service.findById(id);
+		return ResponseEntity.ok().body(obj.getPosts());
+	}
 }
-
-
-
-
-
